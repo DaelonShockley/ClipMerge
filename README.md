@@ -36,3 +36,6 @@ Additionally, the volume of the clip and music audio can be adjusted using the "
 ```
 python clip_merge.py clips/ --audio music.mp3 --music-volume 0.2 --video-volume 1.0
 ```
+
+### FPS
+By default the output will be set to 30 fps, this can be changed by including the --fps flag followed by the desired fps. 
