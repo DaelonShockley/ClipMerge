@@ -54,13 +54,15 @@ def build_concat_file(clips, path):
             f.write(f"file '{os.path.abspath(clip)}'\n")
 
 
-def concat_videos(clips, output, tempdir):
+def concat_videos(clips, output, tempdir, fps):
     concat_file = os.path.join(tempdir, "concat.txt")
     build_concat_file(clips, concat_file)
 
     run(
         [
             "ffmpeg",
+            "-loglevel",
+            "error",
             "-y",
             "-f",
             "concat",
@@ -68,8 +70,16 @@ def concat_videos(clips, output, tempdir):
             "0",
             "-i",
             concat_file,
-            "-c",
-            "copy",
+            "-r",
+            str(fps),
+            "-c:v",
+            "libx264",
+            "-preset",
+            "fast",
+            "-crf",
+            "18",
+            "-c:a",
+            "aac",
             output,
         ]
     )
@@ -94,6 +104,8 @@ def prepare_audio(audio_files, video_duration, tempdir):
     run(
         [
             "ffmpeg",
+            "-loglevel",
+            "error",
             "-y",
             "-f",
             "concat",
@@ -114,6 +126,8 @@ def mix_audio(video, audio, output, video_volume, music_volume):
     run(
         [
             "ffmpeg",
+            "-loglevel",
+            "error",
             "-y",
             "-i",
             video,
@@ -141,6 +155,9 @@ def main():
     parser.add_argument("--video-volume", type=float, default=1.0)
     parser.add_argument("--music-volume", type=float, default=0.3)
 
+    # NEW FPS FLAG
+    parser.add_argument("--fps", type=int, default=30, help="Output video FPS (default: 30)")
+
     args = parser.parse_args()
 
     clips = get_clip_order(args.clip_folder)
@@ -152,11 +169,12 @@ def main():
         temp_video = os.path.join(tempdir, "video.mp4")
 
         print("Concatenating clips...")
-        concat_videos(clips, temp_video, tempdir)
+        concat_videos(clips, temp_video, tempdir, args.fps)
 
         if not args.audio:
             print("No music provided. Saving video only.")
             os.rename(temp_video, args.output)
+            print("Done:", args.output)
             return
 
         print("Preparing audio...")
