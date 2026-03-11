@@ -29,6 +29,8 @@ An audio file can be added to provide background music using the "--audio" flag,
 python clip_merge.py clips/ --audio music.mp3
 ```
 
+Multiple music files can be listed behind this flag. If the video output is longer than the provided audio tracks, then the audio tracks will loop for the remainder of the video. 
+
 Additionally, the volume of the clip and music audio can be adjusted using the "--music-volume" and "--video-volume" flags. For example: 
 
 ```
